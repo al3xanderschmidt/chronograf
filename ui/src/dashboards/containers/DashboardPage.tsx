@@ -19,6 +19,12 @@ import * as cellEditorOverlayActions from 'src/dashboards/actions/cellEditorOver
 import * as appActions from 'src/shared/actions/app'
 import * as errorActions from 'src/shared/actions/errors'
 import * as notifyActions from 'src/shared/actions/notifications'
+
+// flux
+import {
+  UpdateScript,
+  updateScript as updateScriptAction,
+} from 'src/flux/actions'
 import {
   fetchAllFluxServicesAsync,
   FetchAllFluxServicesAsync,
@@ -58,7 +64,9 @@ import * as QueriesModels from 'src/types/queries'
 import * as SourcesModels from 'src/types/sources'
 import * as TempVarsModels from 'src/types/tempVars'
 import * as NotificationsActions from 'src/types/actions/notifications'
+
 import {Service} from 'src/types'
+import {Links} from 'src/types/flux'
 
 interface Props extends ManualRefreshProps, WithRouterProps {
   source: SourcesModels.Source
@@ -115,6 +123,11 @@ interface Props extends ManualRefreshProps, WithRouterProps {
   rehydrateTemplatesAsync: typeof dashboardActions.rehydrateTemplatesAsync
   updateTemplateQueryParams: typeof dashboardActions.updateTemplateQueryParams
   updateQueryParams: typeof dashboardActions.updateQueryParams
+
+  // flux
+  fluxLinks: Links
+  fluxScript: string
+  updateScript: UpdateScript
 }
 
 interface State {
@@ -123,6 +136,8 @@ interface State {
   selectedCell: DashboardsModels.Cell | null
   dashboardLinks: DashboardsModels.DashboardSwitcherLinks
 }
+
+export const NotificationContext = React.createContext(undefined)
 
 @ErrorHandling
 class DashboardPage extends Component<Props, State> {
@@ -190,6 +205,10 @@ class DashboardPage extends Component<Props, State> {
   public render() {
     const {
       isUsingAuth,
+      notify,
+      fluxScript,
+      fluxLinks,
+      updateScript,
       meRole,
       source,
       sources,
@@ -263,75 +282,81 @@ class DashboardPage extends Component<Props, State> {
     const {dashboardLinks} = this.state
 
     return (
-      <div className="page dashboard-page">
-        {selectedCell ? (
-          <CellEditorOverlay
-            source={source}
-            sources={sources}
-            services={this.services}
-            cell={selectedCell}
-            timeRange={timeRange}
-            autoRefresh={autoRefresh}
-            dashboardID={dashboardID}
-            queryStatus={cellQueryStatus}
-            onSave={this.handleSaveEditedCell}
-            onCancel={handleHideCellEditorOverlay}
-            templates={templatesIncludingDashTime}
-            editQueryStatus={this.props.editCellQueryStatus}
-            thresholdsListType={thresholdsListType}
-            thresholdsListColors={thresholdsListColors}
-            gaugeColors={gaugeColors}
-            lineColors={lineColors}
-          />
-        ) : null}
-        <DashboardHeader
-          dashboard={dashboard}
-          timeRange={timeRange}
-          autoRefresh={autoRefresh}
-          isHidden={inPresentationMode}
-          onAddCell={this.handleAddCell}
-          onManualRefresh={onManualRefresh}
-          zoomedTimeRange={zoomedTimeRange}
-          onRenameDashboard={this.handleRenameDashboard}
-          dashboardLinks={dashboardLinks}
-          activeDashboard={dashboard ? dashboard.name : ''}
-          showTemplateControlBar={showTemplateControlBar}
-          handleChooseAutoRefresh={handleChooseAutoRefresh}
-          handleChooseTimeRange={this.handleChooseTimeRange}
-          onToggleTempVarControls={this.handleToggleTempVarControls}
-          handleClickPresentationButton={handleClickPresentationButton}
-        />
-        {inPresentationMode || (
-          <TemplateControlBar
-            templates={dashboard && dashboard.templates}
-            meRole={meRole}
-            isUsingAuth={isUsingAuth}
-            onSaveTemplates={this.handleSaveTemplateVariables}
-            onPickTemplate={this.handlePickTemplate}
-            isOpen={showTemplateControlBar}
-            source={source}
-          />
-        )}
-        {dashboard ? (
-          <Dashboard
-            source={source}
-            sources={sources}
-            setScrollTop={this.setScrollTop}
-            inView={this.inView}
+      <NotificationContext.Provider value={{notify}}>
+        <div className="page dashboard-page">
+          {selectedCell ? (
+            <CellEditorOverlay
+              script={fluxScript}
+              links={fluxLinks}
+              updateScript={updateScript}
+              notify={notify}
+              source={source}
+              sources={sources}
+              services={this.services}
+              cell={selectedCell}
+              timeRange={timeRange}
+              autoRefresh={autoRefresh}
+              dashboardID={dashboardID}
+              queryStatus={cellQueryStatus}
+              onSave={this.handleSaveEditedCell}
+              onCancel={handleHideCellEditorOverlay}
+              templates={templatesIncludingDashTime}
+              editQueryStatus={this.props.editCellQueryStatus}
+              thresholdsListType={thresholdsListType}
+              thresholdsListColors={thresholdsListColors}
+              gaugeColors={gaugeColors}
+              lineColors={lineColors}
+            />
+          ) : null}
+          <DashboardHeader
             dashboard={dashboard}
             timeRange={timeRange}
             autoRefresh={autoRefresh}
-            manualRefresh={manualRefresh}
-            onZoom={this.handleZoomedTimeRange}
-            inPresentationMode={inPresentationMode}
-            onPositionChange={this.handleUpdatePosition}
-            onDeleteCell={this.handleDeleteDashboardCell}
-            onCloneCell={this.handleCloneCell}
-            templatesIncludingDashTime={templatesIncludingDashTime}
-            onSummonOverlayTechnologies={handleShowCellEditorOverlay}
+            isHidden={inPresentationMode}
+            onAddCell={this.handleAddCell}
+            onManualRefresh={onManualRefresh}
+            zoomedTimeRange={zoomedTimeRange}
+            onRenameDashboard={this.handleRenameDashboard}
+            dashboardLinks={dashboardLinks}
+            activeDashboard={dashboard ? dashboard.name : ''}
+            showTemplateControlBar={showTemplateControlBar}
+            handleChooseAutoRefresh={handleChooseAutoRefresh}
+            handleChooseTimeRange={this.handleChooseTimeRange}
+            onToggleTempVarControls={this.handleToggleTempVarControls}
+            handleClickPresentationButton={handleClickPresentationButton}
           />
-        ) : null}
-      </div>
+          {inPresentationMode || (
+            <TemplateControlBar
+              templates={dashboard && dashboard.templates}
+              meRole={meRole}
+              isUsingAuth={isUsingAuth}
+              onSaveTemplates={this.handleSaveTemplateVariables}
+              onPickTemplate={this.handlePickTemplate}
+              isOpen={showTemplateControlBar}
+              source={source}
+            />
+          )}
+          {dashboard ? (
+            <Dashboard
+              source={source}
+              sources={sources}
+              setScrollTop={this.setScrollTop}
+              inView={this.inView}
+              dashboard={dashboard}
+              timeRange={timeRange}
+              autoRefresh={autoRefresh}
+              manualRefresh={manualRefresh}
+              onZoom={this.handleZoomedTimeRange}
+              inPresentationMode={inPresentationMode}
+              onPositionChange={this.handleUpdatePosition}
+              onDeleteCell={this.handleDeleteDashboardCell}
+              onCloneCell={this.handleCloneCell}
+              templatesIncludingDashTime={templatesIncludingDashTime}
+              onSummonOverlayTechnologies={handleShowCellEditorOverlay}
+            />
+          ) : null}
+        </div>
+      </NotificationContext.Provider>
     )
   }
 
@@ -536,6 +561,8 @@ const mstp = (state, {params: {dashboardID}}) => {
     dashboardUI: {dashboards, cellQueryStatus, zoomedTimeRange},
     sources,
     services,
+    links,
+    script,
     dashTimeV1,
     auth: {me, isUsingAuth},
     cellEditorOverlay: {
@@ -578,6 +605,8 @@ const mstp = (state, {params: {dashboardID}}) => {
     thresholdsListColors,
     gaugeColors,
     lineColors,
+    fluxLinks: links.flux,
+    fluxScript: script,
   }
 }
 
@@ -609,7 +638,9 @@ const mdtp = {
   handleHideCellEditorOverlay: cellEditorOverlayActions.hideCellEditorOverlay,
   getAnnotationsAsync: annotationActions.getAnnotationsAsync,
   handleDismissEditingAnnotation: annotationActions.dismissEditingAnnotation,
+  // flux
   fetchServicesAsync: fetchAllFluxServicesAsync,
+  updateScript: updateScriptAction,
 }
 
 export default connect(mstp, mdtp)(
