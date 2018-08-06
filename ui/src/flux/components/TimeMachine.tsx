@@ -12,7 +12,7 @@ import {
   ScriptStatus,
 } from 'src/types/flux'
 
-import {Service} from 'src/types'
+import {Service, NotificationAction} from 'src/types'
 import {ErrorHandling} from 'src/shared/decorators/errors'
 import {HANDLE_VERTICAL, HANDLE_HORIZONTAL} from 'src/shared/constants'
 
@@ -28,6 +28,7 @@ interface Props {
   onAppendFrom: () => void
   onAppendJoin: () => void
   onValidate: () => void
+  notify: NotificationAction
 }
 
 interface Body extends FlatBody {
@@ -94,6 +95,7 @@ class TimeMachine extends PureComponent<Props> {
 
   private get scriptAndExplorer() {
     const {
+      notify,
       script,
       status,
       service,
@@ -134,7 +136,7 @@ class TimeMachine extends PureComponent<Props> {
         handlePixels: 44,
         headerButtons: [],
         menuOptions: [],
-        render: () => <SchemaExplorer service={service} />,
+        render: () => <SchemaExplorer service={service} notify={notify} />,
         headerOrientation: HANDLE_VERTICAL,
       },
     ]

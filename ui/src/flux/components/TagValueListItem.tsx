@@ -47,7 +47,7 @@ class TagValueListItem extends PureComponent<Props, State> {
   }
 
   public render() {
-    const {db, service, value} = this.props
+    const {db, service, value, notify} = this.props
     const {searchTerm, isOpen} = this.state
 
     return (
@@ -88,6 +88,7 @@ class TagValueListItem extends PureComponent<Props, State> {
                 service={service}
                 tags={this.tags}
                 filter={this.filter}
+                notify={notify}
               />
             </>
           )}

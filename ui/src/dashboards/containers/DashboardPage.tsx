@@ -137,8 +137,6 @@ interface State {
   dashboardLinks: DashboardsModels.DashboardSwitcherLinks
 }
 
-export const NotificationContext = React.createContext(undefined)
-
 @ErrorHandling
 class DashboardPage extends Component<Props, State> {
   public constructor(props: Props) {
@@ -282,81 +280,79 @@ class DashboardPage extends Component<Props, State> {
     const {dashboardLinks} = this.state
 
     return (
-      <NotificationContext.Provider value={{notify}}>
-        <div className="page dashboard-page">
-          {selectedCell ? (
-            <CellEditorOverlay
-              script={fluxScript}
-              links={fluxLinks}
-              updateScript={updateScript}
-              notify={notify}
-              source={source}
-              sources={sources}
-              services={this.services}
-              cell={selectedCell}
-              timeRange={timeRange}
-              autoRefresh={autoRefresh}
-              dashboardID={dashboardID}
-              queryStatus={cellQueryStatus}
-              onSave={this.handleSaveEditedCell}
-              onCancel={handleHideCellEditorOverlay}
-              templates={templatesIncludingDashTime}
-              editQueryStatus={this.props.editCellQueryStatus}
-              thresholdsListType={thresholdsListType}
-              thresholdsListColors={thresholdsListColors}
-              gaugeColors={gaugeColors}
-              lineColors={lineColors}
-            />
-          ) : null}
-          <DashboardHeader
+      <div className="page dashboard-page">
+        {selectedCell ? (
+          <CellEditorOverlay
+            script={fluxScript}
+            links={fluxLinks}
+            updateScript={updateScript}
+            notify={notify}
+            source={source}
+            sources={sources}
+            services={this.services}
+            cell={selectedCell}
+            timeRange={timeRange}
+            autoRefresh={autoRefresh}
+            dashboardID={dashboardID}
+            queryStatus={cellQueryStatus}
+            onSave={this.handleSaveEditedCell}
+            onCancel={handleHideCellEditorOverlay}
+            templates={templatesIncludingDashTime}
+            editQueryStatus={this.props.editCellQueryStatus}
+            thresholdsListType={thresholdsListType}
+            thresholdsListColors={thresholdsListColors}
+            gaugeColors={gaugeColors}
+            lineColors={lineColors}
+          />
+        ) : null}
+        <DashboardHeader
+          dashboard={dashboard}
+          timeRange={timeRange}
+          autoRefresh={autoRefresh}
+          isHidden={inPresentationMode}
+          onAddCell={this.handleAddCell}
+          onManualRefresh={onManualRefresh}
+          zoomedTimeRange={zoomedTimeRange}
+          onRenameDashboard={this.handleRenameDashboard}
+          dashboardLinks={dashboardLinks}
+          activeDashboard={dashboard ? dashboard.name : ''}
+          showTemplateControlBar={showTemplateControlBar}
+          handleChooseAutoRefresh={handleChooseAutoRefresh}
+          handleChooseTimeRange={this.handleChooseTimeRange}
+          onToggleTempVarControls={this.handleToggleTempVarControls}
+          handleClickPresentationButton={handleClickPresentationButton}
+        />
+        {inPresentationMode || (
+          <TemplateControlBar
+            templates={dashboard && dashboard.templates}
+            meRole={meRole}
+            isUsingAuth={isUsingAuth}
+            onSaveTemplates={this.handleSaveTemplateVariables}
+            onPickTemplate={this.handlePickTemplate}
+            isOpen={showTemplateControlBar}
+            source={source}
+          />
+        )}
+        {dashboard ? (
+          <Dashboard
+            source={source}
+            sources={sources}
+            setScrollTop={this.setScrollTop}
+            inView={this.inView}
             dashboard={dashboard}
             timeRange={timeRange}
             autoRefresh={autoRefresh}
-            isHidden={inPresentationMode}
-            onAddCell={this.handleAddCell}
-            onManualRefresh={onManualRefresh}
-            zoomedTimeRange={zoomedTimeRange}
-            onRenameDashboard={this.handleRenameDashboard}
-            dashboardLinks={dashboardLinks}
-            activeDashboard={dashboard ? dashboard.name : ''}
-            showTemplateControlBar={showTemplateControlBar}
-            handleChooseAutoRefresh={handleChooseAutoRefresh}
-            handleChooseTimeRange={this.handleChooseTimeRange}
-            onToggleTempVarControls={this.handleToggleTempVarControls}
-            handleClickPresentationButton={handleClickPresentationButton}
+            manualRefresh={manualRefresh}
+            onZoom={this.handleZoomedTimeRange}
+            inPresentationMode={inPresentationMode}
+            onPositionChange={this.handleUpdatePosition}
+            onDeleteCell={this.handleDeleteDashboardCell}
+            onCloneCell={this.handleCloneCell}
+            templatesIncludingDashTime={templatesIncludingDashTime}
+            onSummonOverlayTechnologies={handleShowCellEditorOverlay}
           />
-          {inPresentationMode || (
-            <TemplateControlBar
-              templates={dashboard && dashboard.templates}
-              meRole={meRole}
-              isUsingAuth={isUsingAuth}
-              onSaveTemplates={this.handleSaveTemplateVariables}
-              onPickTemplate={this.handlePickTemplate}
-              isOpen={showTemplateControlBar}
-              source={source}
-            />
-          )}
-          {dashboard ? (
-            <Dashboard
-              source={source}
-              sources={sources}
-              setScrollTop={this.setScrollTop}
-              inView={this.inView}
-              dashboard={dashboard}
-              timeRange={timeRange}
-              autoRefresh={autoRefresh}
-              manualRefresh={manualRefresh}
-              onZoom={this.handleZoomedTimeRange}
-              inPresentationMode={inPresentationMode}
-              onPositionChange={this.handleUpdatePosition}
-              onDeleteCell={this.handleDeleteDashboardCell}
-              onCloneCell={this.handleCloneCell}
-              templatesIncludingDashTime={templatesIncludingDashTime}
-              onSummonOverlayTechnologies={handleShowCellEditorOverlay}
-            />
-          ) : null}
-        </div>
-      </NotificationContext.Provider>
+        ) : null}
+      </div>
     )
   }
 

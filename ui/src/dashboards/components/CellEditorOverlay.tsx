@@ -19,7 +19,6 @@ import {
   validateSuccess,
   fluxTimeSeriesError,
   fluxResponseTruncatedError,
-  notifyCopyToClipboardSuccess,
 } from 'src/shared/copy/notifications'
 import {UpdateScript} from 'src/flux/actions'
 
@@ -274,9 +273,8 @@ class CellEditorOverlay extends Component<Props, State> {
       timeRange,
       autoRefresh,
       editQueryStatus,
-      notify,
     } = this.props
-    notify(notifyCopyToClipboardSuccess('yo'))
+
     const {activeEditorTab, queriesWorkingDraft, isStaticLegend} = this.state
 
     return (
@@ -356,12 +354,13 @@ class CellEditorOverlay extends Component<Props, State> {
 
   private get fluxBuilder(): JSX.Element {
     const {suggestions, body, status} = this.state
-    const {script} = this.props
+    const {script, notify} = this.props
 
     return (
       <FluxContext.Provider value={this.getContext}>
         <KeyboardShortcuts onControlEnter={this.getTimeSeries}>
           <TimeMachine
+            notify={notify}
             body={body}
             script={script}
             status={status}

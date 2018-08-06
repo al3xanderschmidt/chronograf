@@ -125,7 +125,7 @@ export class FluxPage extends PureComponent<Props, State> {
 
   public render() {
     const {suggestions, body, status} = this.state
-    const {script, service} = this.props
+    const {script, service, notify} = this.props
 
     return (
       <FluxContext.Provider value={this.getContext}>
@@ -133,6 +133,7 @@ export class FluxPage extends PureComponent<Props, State> {
           <div className="page hosts-list-page">
             {this.header}
             <TimeMachine
+              notify={notify}
               body={body}
               script={script}
               status={status}

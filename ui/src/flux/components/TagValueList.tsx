@@ -2,9 +2,8 @@ import React, {PureComponent, MouseEvent} from 'react'
 
 import TagValueListItem from 'src/flux/components/TagValueListItem'
 import LoadingSpinner from 'src/flux/components/LoadingSpinner'
-import {NotificationContext} from 'src/flux/containers/CheckServices'
 
-import {Service, SchemaFilter} from 'src/types'
+import {Service, SchemaFilter, NotificationAction} from 'src/types'
 
 interface Props {
   service: Service
@@ -12,6 +11,7 @@ interface Props {
   tagKey: string
   values: string[]
   filter: SchemaFilter[]
+  notify: NotificationAction
   isLoadingMoreValues: boolean
   onLoadMoreValues: () => void
   shouldShowMoreValues: boolean
@@ -22,6 +22,7 @@ export default class TagValueList extends PureComponent<Props> {
   public render() {
     const {
       db,
+      notify,
       service,
       values,
       tagKey,
@@ -32,19 +33,15 @@ export default class TagValueList extends PureComponent<Props> {
     return (
       <>
         {values.map((v, i) => (
-          <NotificationContext.Consumer key={v}>
-            {({notify}) => (
-              <TagValueListItem
-                key={i}
-                db={db}
-                value={v}
-                tagKey={tagKey}
-                service={service}
-                filter={filter}
-                notify={notify}
-              />
-            )}
-          </NotificationContext.Consumer>
+          <TagValueListItem
+            key={i}
+            db={db}
+            value={v}
+            tagKey={tagKey}
+            service={service}
+            filter={filter}
+            notify={notify}
+          />
         ))}
         {shouldShowMoreValues && (
           <div className="flux-schema-tree flux-schema--child">
