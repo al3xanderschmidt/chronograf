@@ -360,6 +360,7 @@ class CellEditorOverlay extends Component<Props, State> {
       <FluxContext.Provider value={this.getContext}>
         <KeyboardShortcuts onControlEnter={this.getTimeSeries}>
           <TimeMachine
+            context={this.getContext}
             notify={notify}
             body={body}
             script={script}

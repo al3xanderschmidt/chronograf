@@ -9,11 +9,12 @@ import BodyDelete from 'src/flux/components/BodyDelete'
 import {funcNames} from 'src/flux/constants'
 
 import {Service} from 'src/types'
-import {Body, Suggestion} from 'src/types/flux'
+import {Body, Suggestion, Context} from 'src/types/flux'
 
 interface Props {
   service: Service
   body: Body[]
+  context: Context
   suggestions: Suggestion[]
   onAppendFrom: () => void
   onAppendJoin: () => void
@@ -22,7 +23,7 @@ interface Props {
 
 class BodyBuilder extends PureComponent<Props> {
   public render() {
-    const {body, onDeleteBody} = this.props
+    const {body, context, onDeleteBody} = this.props
 
     const bodybuilder = body.map((b, i) => {
       if (b.declarations.length) {
@@ -37,6 +38,7 @@ class BodyBuilder extends PureComponent<Props> {
                   </div>
                 </div>
                 <ExpressionNode
+                  context={context}
                   bodyID={b.id}
                   declarationID={d.id}
                   funcNames={this.funcNames}
@@ -69,6 +71,7 @@ class BodyBuilder extends PureComponent<Props> {
       return (
         <div className="declaration" key={i}>
           <ExpressionNode
+            context={context}
             bodyID={b.id}
             funcs={b.funcs}
             funcNames={this.funcNames}

@@ -10,6 +10,7 @@ import {
   OnDeleteBody,
   FlatBody,
   ScriptStatus,
+  Context,
 } from 'src/types/flux'
 
 import {Service, NotificationAction} from 'src/types'
@@ -17,6 +18,7 @@ import {ErrorHandling} from 'src/shared/decorators/errors'
 import {HANDLE_VERTICAL, HANDLE_HORIZONTAL} from 'src/shared/constants'
 
 interface Props {
+  context: Context
   service: Service
   script: string
   body: Body[]
@@ -68,6 +70,7 @@ class TimeMachine extends PureComponent<Props> {
   private get builder() {
     const {
       body,
+      context,
       service,
       suggestions,
       onAppendFrom,
@@ -83,6 +86,7 @@ class TimeMachine extends PureComponent<Props> {
       render: () => (
         <BodyBuilder
           body={body}
+          context={context}
           service={service}
           suggestions={suggestions}
           onDeleteBody={onDeleteBody}

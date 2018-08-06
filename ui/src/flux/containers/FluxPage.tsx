@@ -133,6 +133,7 @@ export class FluxPage extends PureComponent<Props, State> {
           <div className="page hosts-list-page">
             {this.header}
             <TimeMachine
+              context={this.getContext}
               notify={notify}
               body={body}
               script={script}
