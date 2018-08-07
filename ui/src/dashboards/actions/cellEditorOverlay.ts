@@ -23,6 +23,7 @@ export enum ActionType {
   ChangeTimeFormat = 'CHANGE_TIME_FORMAT',
   ChangeDecimalPlaces = 'CHANGE_DECIMAL_PLACES',
   UpdateFieldOptions = 'UPDATE_FIELD_OPTIONS',
+  UpdateFluxScript = 'UPDATE_FLUX_SCRIPT',
 }
 
 export type Action =
@@ -39,6 +40,7 @@ export type Action =
   | ChangeTimeFormatAction
   | ChangeDecimalPlacesAction
   | UpdateFieldOptionsAction
+  | UpdateFluxScriptAction
 
 export interface ShowCellEditorOverlayAction {
   type: ActionType.ShowCellEditorOverlay
@@ -127,6 +129,22 @@ export interface UpdateFieldOptionsAction {
     fieldOptions: FieldOption[]
   }
 }
+
+export interface UpdateFluxScriptAction {
+  type: ActionType.UpdateFluxScript
+  payload: {
+    fluxScript: string
+  }
+}
+
+export const updateFluxScript = (
+  fluxScript: string
+): UpdateFluxScriptAction => ({
+  type: ActionType.UpdateFluxScript,
+  payload: {
+    fluxScript,
+  },
+})
 
 export const showCellEditorOverlay = (
   cell: Cell

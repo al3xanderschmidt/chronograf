@@ -13,6 +13,7 @@ import {
   validateLineColors,
 } from 'src/shared/constants/graphColorPalettes'
 
+import {editor} from 'src/flux/constants'
 import {initializeOptions} from 'src/dashboards/constants/cellEditor'
 import {Action, ActionType} from 'src/dashboards/actions/cellEditorOverlay'
 import {CellType, Cell} from 'src/types'
@@ -25,6 +26,7 @@ interface CEOInitialState {
   thresholdsListColors: ThresholdColor[]
   gaugeColors: GaugeColor[]
   lineColors: LineColor[]
+  fluxScript: string
 }
 
 export const initialState = {
@@ -33,6 +35,7 @@ export const initialState = {
   thresholdsListColors: DEFAULT_THRESHOLDS_LIST_COLORS,
   gaugeColors: DEFAULT_GAUGE_COLORS,
   lineColors: DEFAULT_LINE_COLORS,
+  fluxScript: editor.DEFAULT_SCRIPT,
 }
 
 export default (state = initialState, action: Action): CEOInitialState => {
@@ -150,6 +153,15 @@ export default (state = initialState, action: Action): CEOInitialState => {
       const {lineColors} = action.payload
 
       return {...state, lineColors}
+    }
+
+    case ActionType.UpdateFluxScript: {
+      const {fluxScript} = action.payload
+
+      return {
+        ...state,
+        fluxScript,
+      }
     }
   }
 

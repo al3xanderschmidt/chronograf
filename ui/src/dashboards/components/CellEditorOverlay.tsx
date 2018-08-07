@@ -20,7 +20,6 @@ import {
   fluxTimeSeriesError,
   fluxResponseTruncatedError,
 } from 'src/shared/copy/notifications'
-import {UpdateScript} from 'src/flux/actions'
 
 // APIs
 import {getQueryConfigAndStatus} from 'src/shared/apis'
@@ -132,7 +131,7 @@ interface Props {
   script: string
   links: Links
   notify: PublishNotificationActionCreator
-  updateScript: UpdateScript
+  updateScript: (fluxScript: string) => void
 }
 
 interface State {

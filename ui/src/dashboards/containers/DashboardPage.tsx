@@ -21,10 +21,7 @@ import * as errorActions from 'src/shared/actions/errors'
 import * as notifyActions from 'src/shared/actions/notifications'
 
 // flux
-import {
-  UpdateScript,
-  updateScript as updateScriptAction,
-} from 'src/flux/actions'
+import {updateFluxScript as updateScriptAction} from 'src/dashboards/actions/cellEditorOverlay'
 import {
   fetchAllFluxServicesAsync,
   FetchAllFluxServicesAsync,
@@ -127,7 +124,7 @@ interface Props extends ManualRefreshProps, WithRouterProps {
   // flux
   fluxLinks: Links
   fluxScript: string
-  updateScript: UpdateScript
+  updateScript: (fluxScript: string) => void
 }
 
 interface State {
@@ -558,7 +555,6 @@ const mstp = (state, {params: {dashboardID}}) => {
     sources,
     services,
     links,
-    script,
     dashTimeV1,
     auth: {me, isUsingAuth},
     cellEditorOverlay: {
@@ -567,6 +563,7 @@ const mstp = (state, {params: {dashboardID}}) => {
       thresholdsListColors,
       gaugeColors,
       lineColors,
+      fluxScript,
     },
   } = state
 
@@ -602,7 +599,7 @@ const mstp = (state, {params: {dashboardID}}) => {
     gaugeColors,
     lineColors,
     fluxLinks: links.flux,
-    fluxScript: script,
+    fluxScript,
   }
 }
 
