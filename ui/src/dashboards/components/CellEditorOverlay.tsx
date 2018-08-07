@@ -48,6 +48,7 @@ import {
 } from 'src/flux/helpers/scriptBuilder'
 
 // Constants
+import {editor} from 'src/flux/constants'
 import {IS_STATIC_LEGEND} from 'src/shared/constants'
 import {TYPE_QUERY_CONFIG, CEOTabs} from 'src/dashboards/constants'
 import {OVERLAY_TECHNOLOGY} from 'src/shared/constants/classNames'
@@ -188,6 +189,7 @@ class CellEditorOverlay extends Component<Props, State> {
 
     const {
       cell: {legend},
+      services,
     } = props
     let {
       cell: {queries},
@@ -198,6 +200,19 @@ class CellEditorOverlay extends Component<Props, State> {
       queries = [{id: uuid.v4()}]
     }
 
+    const cellSourceLink = getDeep<string>(queries, '0.source', '')
+    const sourceLinkWithService = cellSourceLink.match('services')
+    const isFluxQuery = sourceLinkWithService && sourceLinkWithService.length
+    let selectedService: Service
+    if (cellSourceLink && isFluxQuery) {
+      const cellSource = services.find(s => {
+        return s.links.self === cellSourceLink
+      })
+      if (cellSource) {
+        selectedService = cellSource
+      }
+    }
+
     const queriesWorkingDraft = createWorkingDrafts(this.initialSource, queries)
 
     this.state = {
@@ -205,7 +220,7 @@ class CellEditorOverlay extends Component<Props, State> {
       activeQueryIndex: 0,
       activeEditorTab: CEOTabs.Queries,
       isStaticLegend: IS_STATIC_LEGEND(legend),
-      selectedService: null,
+      selectedService,
       selectedSource: null,
 
       // flux
@@ -461,20 +476,37 @@ class CellEditorOverlay extends Component<Props, State> {
 
   private handleSaveCell = () => {
     const {queriesWorkingDraft, isStaticLegend} = this.state
-    const {cell, thresholdsListColors, gaugeColors, lineColors} = this.props
+    const {
+      cell,
+      thresholdsListColors,
+      gaugeColors,
+      lineColors,
+      script,
+    } = this.props
+    let queries: DashboardsModels.CellQuery[]
 
-    const queries: DashboardsModels.CellQuery[] = queriesWorkingDraft.map(q => {
-      const timeRange = q.range || {
-        upper: null,
-        lower: TEMP_VAR_DASHBOARD_TIME,
-      }
-      const source = getDeep<string | null>(q.source, 'links.self', null)
-      return {
-        queryConfig: q,
-        query: q.rawText || buildQuery(TYPE_QUERY_CONFIG, timeRange, q),
-        source,
-      }
-    })
+    if (this.isFluxSource) {
+      queries = [
+        {
+          query: script,
+          queryConfig: null,
+          source: this.service.links.self,
+        },
+      ]
+    } else {
+      queries = queriesWorkingDraft.map(q => {
+        const timeRange = q.range || {
+          upper: null,
+          lower: TEMP_VAR_DASHBOARD_TIME,
+        }
+        const source = getDeep<string | null>(q.source, 'links.self', null)
+        return {
+          queryConfig: q,
+          query: q.rawText || buildQuery(TYPE_QUERY_CONFIG, timeRange, q),
+          source,
+        }
+      })
+    }
 
     const colors = getCellTypeColors({
       cellType: cell.type,
@@ -676,6 +708,13 @@ class CellEditorOverlay extends Component<Props, State> {
   private get isSaveable(): boolean {
     const {queriesWorkingDraft} = this.state
 
+    if (this.isFluxSource) {
+      return (
+        this.state.status.type === 'success' &&
+        this.props.script !== editor.DEFAULT_SCRIPT
+      )
+    }
+
     return queriesWorkingDraft.every(
       (query: QueriesModels.QueryConfig) =>
         (!!query.measurement && !!query.database && !!query.fields.length) ||
@@ -715,11 +754,24 @@ class CellEditorOverlay extends Component<Props, State> {
   }
 
   private get source(): SourcesModels.Source {
-    const {source, sources} = this.props
+    const {source, sources, cell} = this.props
     const {selectedSource} = this.state
 
     if (selectedSource) {
       return selectedSource
+    }
+
+    let cellSourceLink = getDeep<string>(cell, 'queries.0.source', '')
+
+    if (cellSourceLink) {
+      // remove /services/id if needed from cellsource
+      cellSourceLink = cellSourceLink.replace(/\/services\/.*/, '')
+      const cellSource = sources.find(s => {
+        return s.links.self === cellSourceLink
+      })
+      if (cellSource) {
+        return cellSource
+      }
     }
 
     const query = _.get(this.state.queriesWorkingDraft, 0, {source: null})
