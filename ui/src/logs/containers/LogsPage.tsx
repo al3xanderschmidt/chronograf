@@ -546,7 +546,6 @@ class LogsPage extends Component<Props, State> {
   ) => {
     this.props.changeFilter(id, operator, value)
     this.fetchNewDataset()
-    this.props.executeQueriesAsync()
   }
 
   private handleBarClick = (time: string): void => {
